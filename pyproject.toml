@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "continuous-batching"
+version = "0.1.0"
+description = "A correctness-first continuous batching inference server and performance study."
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "accelerate==1.8.1",
+    "fastapi==0.115.14",
+    "huggingface-hub==0.33.2",
+    "httpx==0.28.1",
+    "matplotlib==3.10.3",
+    "numpy==2.2.6",
+    "safetensors==0.5.3",
+    "torch==2.7.1",
+    "transformers==4.53.1",
+    "uvicorn==0.34.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest-asyncio==1.0.0",
+    "pytest==8.4.1",
+]
+
+[project.scripts]
+continuous-batching-server = "continuous_batching.server:main"
+continuous-batching-loadgen = "bench.loadgen:main"
+continuous-batching-analyze = "bench.analyze:main"
+continuous-batching-sweep = "bench.sweep:main"
+
+[project.urls]
+Repository = "https://github.com/JoJojo1256/continuous-batching"
+
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = ["bench*", "continuous_batching*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]
