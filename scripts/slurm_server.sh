@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
-#SBATCH -p 3090-gcondo,gpu
+#SBATCH -p gpu
 #SBATCH --gres=gpu:1
-#SBATCH -N 1
-#SBATCH -n 4
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=4
 #SBATCH --mem=40g
 #SBATCH --time=04:00:00
 #SBATCH -J continuous-batching
@@ -11,8 +12,13 @@
 
 set -euo pipefail
 
-repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$repo_root"
+cd "${SLURM_SUBMIT_DIR:?Submit this script with sbatch}"
+mkdir -p results/logs results/raw
+
+module purge
+unset LD_LIBRARY_PATH || true
+module load cudnn cuda "${PYTHON_MODULE:-python/3.11.11-5e66}"
+export HF_HOME="${HF_HOME:-$HOME/scratch/hf_cache}"
 
 bash scripts/run_gpu.sh \
     --model-name "${MODEL_NAME:-meta-llama/Llama-3.1-8B-Instruct}" \
