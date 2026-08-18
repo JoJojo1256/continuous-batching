@@ -50,7 +50,9 @@ sbatch scripts/slurm_compare.sh
 
 The comparison loads one server at a time for sequential, static, and continuous
 modes. It covers concurrency 1, 2, 4, and 8 with uniform and bimodal output
-lengths, eight requests per measured trial, and three measured trials. Override
+lengths, 32 requests per measured trial, eight warmups, and three measured trials.
+This keeps multiple request waves queued even at concurrency 8 so continuous slot
+refill is exercised. Override
 `CONCURRENCIES`, `WORKLOADS`, `REQUESTS`, or the model and server settings with
 exported environment variables.
 

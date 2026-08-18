@@ -6,7 +6,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=40G
-#SBATCH --time=02:00:00
+#SBATCH --time=04:00:00
 #SBATCH --output=results/logs/%x_%j.out
 #SBATCH --error=results/logs/%x_%j.err
 
@@ -84,13 +84,13 @@ for mode in sequential static continuous; do
                 --url "$server_url" \
                 --prompts bench/prompts.txt \
                 --output "$output" \
-                --requests "${REQUESTS:-8}" \
+                --requests "${REQUESTS:-32}" \
                 --arrival closed \
                 --concurrency "$concurrency" \
                 --length-workload "$workload" \
                 --min-output-tokens "${MIN_OUTPUT_TOKENS:-8}" \
                 --max-output-tokens "${MAX_OUTPUT_TOKENS:-32}" \
-                --warmup-requests "${WARMUP_REQUESTS:-2}" \
+                --warmup-requests "${WARMUP_REQUESTS:-8}" \
                 --trials 3
         done
     done
