@@ -23,11 +23,6 @@ source "${VENV_PATH:-$HOME/continuous-batching.venv}/bin/activate"
 export HF_HOME="${HF_HOME:-$HOME/scratch/hf_cache}"
 export TOKENIZERS_PARALLELISM=false
 
-if [[ -z "${HF_TOKEN:-}" ]]; then
-    echo "HF_TOKEN must be exported before submitting this job." >&2
-    exit 1
-fi
-
 port="${PORT:-8000}"
 job_id="${SLURM_JOB_ID:-manual}"
 server_log="results/logs/continuous-batching-server_${job_id}.log"
@@ -35,7 +30,7 @@ metrics_path="results/raw/continuous-batching-server_${job_id}.jsonl"
 client_path="results/raw/continuous-batching-smoke_${job_id}.jsonl"
 
 bash scripts/run_gpu.sh \
-    --model-name "${MODEL_NAME:-meta-llama/Llama-3.1-8B-Instruct}" \
+    --model-name "${MODEL_NAME:-Qwen/Qwen2.5-7B-Instruct}" \
     --host 127.0.0.1 \
     --port "$port" \
     --device cuda \

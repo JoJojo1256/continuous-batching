@@ -34,9 +34,13 @@ bash scripts/run_gpu.sh \
 For the first recorded end-to-end smoke benchmark, submit:
 
 ```bash
-export HF_TOKEN="<read-only-token>"
 sbatch scripts/slurm_smoke.sh
 ```
+
+The smoke job defaults to the public `Qwen/Qwen2.5-7B-Instruct` model so model
+access does not block GPU validation. To run the gated Llama model instead,
+accept its license, create a read-only Hugging Face token, and submit with
+`MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct` and `HF_TOKEN` exported.
 
 For a standalone server run, submit:
 
