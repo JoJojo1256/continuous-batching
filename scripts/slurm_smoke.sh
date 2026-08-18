@@ -22,6 +22,8 @@ source "${VENV_PATH:-$HOME/continuous-batching.venv}/bin/activate"
 
 export HF_HOME="${HF_HOME:-$HOME/scratch/hf_cache}"
 export TOKENIZERS_PARALLELISM=false
+export NO_PROXY="${NO_PROXY:+$NO_PROXY,}127.0.0.1,localhost"
+export no_proxy="$NO_PROXY"
 
 port="${PORT:-8000}"
 job_id="${SLURM_JOB_ID:-manual}"
@@ -51,7 +53,7 @@ for _ in $(seq 1 120); do
         exit 1
     fi
     if python -c \
-        "import httpx; httpx.get('$server_url/metrics', timeout=2).raise_for_status()" \
+        "import httpx; response = httpx.get('$server_url/metrics', timeout=2); response.raise_for_status(); assert 'request_count' in response.json()" \
         >/dev/null 2>&1; then
         break
     fi
@@ -59,7 +61,7 @@ for _ in $(seq 1 120); do
 done
 
 python -c \
-    "import httpx; httpx.get('$server_url/metrics', timeout=2).raise_for_status()" \
+    "import httpx; response = httpx.get('$server_url/metrics', timeout=2); response.raise_for_status(); assert 'request_count' in response.json()" \
     >/dev/null
 
 continuous-batching-loadgen \
