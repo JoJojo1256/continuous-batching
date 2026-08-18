@@ -155,6 +155,9 @@ On Brown Oscar, `scripts/slurm_smoke.sh` starts a continuous-batching server,
 waits for it to become ready, and records a small three-trial load-generator run
 with the public `Qwen/Qwen2.5-7B-Instruct` model by default. See
 [`GPU_ACCESS.md`](GPU_ACCESS.md) for login, setup, and submission commands.
+After that gate passes, `scripts/slurm_compare.sh` records a compact
+sequential-versus-static-versus-continuous comparison while keeping only one
+model resident on the GPU at a time.
 
 Accept the model's license before downloading it. Keep Hugging Face tokens, model
 weights, raw measurements, scheduler logs, and profiler output out of the repository.

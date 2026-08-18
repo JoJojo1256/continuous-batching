@@ -42,6 +42,18 @@ access does not block GPU validation. To run the gated Llama model instead,
 accept its license, create a read-only Hugging Face token, and submit with
 `MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct` and `HF_TOKEN` exported.
 
+After the smoke job succeeds, run the single-GPU scheduling comparison:
+
+```bash
+sbatch scripts/slurm_compare.sh
+```
+
+The comparison loads one server at a time for sequential, static, and continuous
+modes. It covers concurrency 1, 2, 4, and 8 with uniform and bimodal output
+lengths, eight requests per measured trial, and three measured trials. Override
+`CONCURRENCIES`, `WORKLOADS`, `REQUESTS`, or the model and server settings with
+exported environment variables.
+
 For a standalone server run, submit:
 
 ```bash
