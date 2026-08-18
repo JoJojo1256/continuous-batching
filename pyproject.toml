@@ -31,6 +31,7 @@ dev = [
 continuous-batching-server = "continuous_batching.server:main"
 continuous-batching-loadgen = "bench.loadgen:main"
 continuous-batching-analyze = "bench.analyze:main"
+continuous-batching-compare-analyze = "bench.compare:main"
 continuous-batching-sweep = "bench.sweep:main"
 
 [project.urls]

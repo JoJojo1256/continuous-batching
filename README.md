@@ -159,5 +159,13 @@ After that gate passes, `scripts/slurm_compare.sh` records a compact
 sequential-versus-static-versus-continuous comparison while keeping only one
 model resident on the GPU at a time.
 
+Generate the matrix summary and figure from a completed comparison:
+
+```bash
+continuous-batching-compare-analyze \
+  results/raw/continuous-batching-compare_<job-id>_*_c*.jsonl \
+  --output-dir results/compare_<job-id>
+```
+
 Accept the model's license before downloading it. Keep Hugging Face tokens, model
 weights, raw measurements, scheduler logs, and profiler output out of the repository.
