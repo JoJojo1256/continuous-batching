@@ -7,6 +7,12 @@ queued requests take their slots on the next decoding iteration. The accompanyin
 load generator, sweep runner, and analysis tools make static-versus-continuous
 throughput and latency comparisons reproducible.
 
+The final Brown Oscar A40 comparison measured 2,304 requests across 24
+configurations. At concurrency 8, continuous batching delivered 52.41-53.74 output
+tokens/second versus 33.46-34.11 sequentially, while reducing p99 latency relative
+to static batching. See [`TECHNICAL_REPORT.md`](TECHNICAL_REPORT.md) for the full
+architecture, methodology, results, debugging history, and interpretation.
+
 ## Architecture
 
 `src/continuous_batching` separates scheduling from model execution so every policy
