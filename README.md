@@ -7,6 +7,12 @@ queued requests take their slots on the next decoding iteration. The accompanyin
 load generator, sweep runner, and analysis tools make static-versus-continuous
 throughput and latency comparisons reproducible.
 
+The final Brown Oscar A40 comparison measured 2,304 requests across 24
+configurations. At concurrency 8, continuous batching delivered 52.41-53.74 output
+tokens/second versus 33.46-34.11 sequentially, while reducing p99 latency relative
+to static batching. See [`TECHNICAL_REPORT.md`](TECHNICAL_REPORT.md) for the full
+architecture, methodology, results, debugging history, and interpretation.
+
 ## Architecture
 
 `src/continuous_batching` separates scheduling from model execution so every policy
@@ -149,6 +155,22 @@ export HF_TOKEN="<read-only-token>"
 bash scripts/run_gpu.sh \
   --model-name meta-llama/Llama-3.1-8B-Instruct \
   --mode continuous --max-batch-size 16
+```
+
+On Brown Oscar, `scripts/slurm_smoke.sh` starts a continuous-batching server,
+waits for it to become ready, and records a small three-trial load-generator run
+with the public `Qwen/Qwen2.5-7B-Instruct` model by default. See
+[`GPU_ACCESS.md`](GPU_ACCESS.md) for login, setup, and submission commands.
+After that gate passes, `scripts/slurm_compare.sh` records a compact
+sequential-versus-static-versus-continuous comparison while keeping only one
+model resident on the GPU at a time.
+
+Generate the matrix summary and figure from a completed comparison:
+
+```bash
+continuous-batching-compare-analyze \
+  results/raw/continuous-batching-compare_<job-id>_*_c*.jsonl \
+  --output-dir results/compare_<job-id>
 ```
 
 Accept the model's license before downloading it. Keep Hugging Face tokens, model

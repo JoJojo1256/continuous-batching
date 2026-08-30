@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import json
+
 import httpx
 import pytest
 
 from bench.loadgen import output_lengths
+from bench.compare import comparison_rows
 from continuous_batching.config import InferenceConfig
 from continuous_batching.engine import ModelEngine
 from continuous_batching.server import create_app
@@ -56,3 +59,41 @@ def test_seeded_workload_shapes_are_reproducible() -> None:
     assert all(8 <= value <= 64 for value in first)
     assert any(value <= 22 for value in first)
     assert any(value >= 50 for value in first)
+
+
+def test_comparison_rows_extract_mode_and_workload(tmp_path) -> None:
+    path = tmp_path / "continuous.jsonl"
+    records = [
+        {
+            "type": "loadgen_config",
+            "concurrency": 4,
+            "length_workload": "bimodal",
+        },
+        {
+            "type": "server_metrics",
+            "provenance": {"config": {"mode": "continuous"}},
+        },
+        {
+            "type": "client_request",
+            "request_id": "one",
+            "start_time": 1.0,
+            "first_token_time": 1.1,
+            "finish_time": 1.5,
+            "ttft_ms": 100.0,
+            "tpot_ms": 40.0,
+            "end_to_end_ms": 500.0,
+            "output_token_count": 10,
+            "error": None,
+        },
+    ]
+    path.write_text(
+        "".join(json.dumps(record) + "\n" for record in records),
+        encoding="utf-8",
+    )
+
+    rows = comparison_rows([path])
+
+    assert rows[0]["mode"] == "continuous"
+    assert rows[0]["concurrency"] == 4
+    assert rows[0]["workload"] == "bimodal"
+    assert rows[0]["throughput_tokens_per_second"] == 20.0

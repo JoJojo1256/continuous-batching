@@ -5,18 +5,58 @@ hosts are not substitutes.
 
 ## Brown Oscar
 
+Connect from PowerShell and clone or update the repository on the login node:
+
+```powershell
+ssh <brown-username>@ssh.ccv.brown.edu
+```
+
+```bash
+git clone https://github.com/JoJojo1256/continuous-batching.git
+cd continuous-batching
+```
+
+If the clone already exists, run `git pull --ff-only` instead. Do not run model
+workloads on the login node.
+
 Use a GPU interactive allocation for setup and debugging:
 
 ```bash
 interact -q gpu -g 1 -f ampere -m 40g -n 4
 bash env/setup.sh
 export HF_TOKEN="<read-only-token>"
+export HF_HOME="$HOME/scratch/hf_cache"
 bash scripts/run_gpu.sh \
   --model-name meta-llama/Llama-3.1-8B-Instruct \
   --mode continuous --max-batch-size 16
 ```
 
-For a recorded server run, submit the committed Slurm wrapper:
+For the first recorded end-to-end smoke benchmark, submit:
+
+```bash
+sbatch scripts/slurm_smoke.sh
+```
+
+The smoke job defaults to the public `Qwen/Qwen2.5-7B-Instruct` model so model
+access does not block GPU validation. To run the gated Llama model instead,
+accept its license, create a read-only Hugging Face token, and submit with
+`MODEL_NAME=meta-llama/Llama-3.1-8B-Instruct` and `HF_TOKEN` exported.
+
+After the smoke job succeeds, run the single-GPU scheduling comparison:
+
+```bash
+sbatch scripts/slurm_compare.sh
+```
+
+The comparison loads one server at a time for sequential, static, and continuous
+modes. It covers concurrency 1, 2, 4, and 8 with uniform and bimodal output
+lengths, 32 requests per measured trial, eight warmups, and three measured trials.
+This keeps multiple request waves queued even at concurrency 8 so continuous slot
+refill is exercised. Override
+`CONCURRENCIES`, `WORKLOADS`, `REQUESTS`, or the model and server settings with
+exported environment variables.
+
+For a standalone server run, submit:
 
 ```bash
 export HF_TOKEN="<read-only-token>"
@@ -25,8 +65,9 @@ sbatch scripts/slurm_server.sh
 
 Override `MODEL_NAME`, `MODE`, `MAX_BATCH_SIZE`, `PORT`, `HF_HOME`, or `VENV_PATH`
 with exported environment variables. The default 8B model should be attempted first
-on a 24 GiB Ampere GPU. Store model weights under Oscar scratch storage and keep them
-out of the repository.
+on a 24 GiB Ampere GPU. The exploratory account uses the general `gpu` partition and
+has four CPU cores. Store model weights and raw results under Oscar scratch storage,
+copy important results off Oscar, and keep them out of the repository.
 
 ## Standalone Linux CUDA host
 
